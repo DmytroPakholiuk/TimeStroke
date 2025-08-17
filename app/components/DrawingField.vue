@@ -2,7 +2,10 @@
   const mouseIsDown = ref(false);
   const canvasHeight = ref(400);
   const canvasWidth = ref(400);
-  const lineWidth = 2;
+  const lineWidth = 1;
+  const superDotWidth = 3;
+  const superDots = [];
+  let drawingStartTime;
   let canvas;
   let context;
 
@@ -16,27 +19,41 @@
     context = canvas.getContext("2d");
   })
 
+  function putSuperDot(x: number, y: number) {
+    context.beginPath();
+    context.fillStyle = "blue";
+    context.fillRect(
+        x - Math.floor(superDotWidth / 2),
+        y - Math.floor(superDotWidth / 2),
+        superDotWidth,
+        superDotWidth
+    );
+    context.closePath();
+  }
+
   function canvasStartDrawing($event) {
     prevX = currX;
     prevY = currY;
     currX = $event.clientX - canvas.getBoundingClientRect().left;
     currY = $event.clientY - canvas.getBoundingClientRect().top;
-    // currX = 20;
-    // currY = 20;
-
-    console.log($event.clientX, canvas.getBoundingClientRect().left)
-    console.log($event.clientY, canvas.getBoundingClientRect().top)
 
     mouseIsDown.value = true;
+    drawingStartTime = Date.now();
 
     context.beginPath();
     context.fillStyle = "red";
-    context.fillRect(currX, currY, 2, 2);
+    context.fillRect(
+        Math.floor(lineWidth / 2),
+        Math.floor(lineWidth / 2),
+        lineWidth,
+        lineWidth
+    );
     context.closePath();
   }
 
   function canvasStopDrawing() {
     mouseIsDown.value = false;
+    superDots.length = 0;
   }
 
   function canvasMouseMove($event) {
@@ -45,14 +62,21 @@
       prevY = currY;
       currX = $event.clientX - canvas.getBoundingClientRect().left;
       currY = $event.clientY - canvas.getBoundingClientRect().top;
-      // currX = 20;
-      // currY = 20;
       draw();
+
+      const drawTime = Date.now();
+      const frameNo = Math.floor((drawTime - drawingStartTime) / (1000 / 24))
+      if (! superDots[frameNo]) {
+        superDots[frameNo] = {
+          x: currX,
+          y: currY,
+        }
+        putSuperDot(currX, currY)
+      }
     }
   }
 
   function draw() {
-    // added parameter ctx
     context.beginPath();
     context.moveTo(prevX, prevY);
     context.lineTo(currX, currY);
