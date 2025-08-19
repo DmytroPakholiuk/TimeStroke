@@ -1,18 +1,32 @@
 <script setup lang="ts">
   const mouseIsDown = ref(false);
-  const canvasHeight = ref(400);
-  const canvasWidth = ref(400);
-  const lineWidth = 1;
-  const superDotWidth = 3;
   const superDots = [];
   let drawingStartTime;
   let canvas;
   let context;
-
   let currX = 0;
   let currY = 0;
   let prevX = 0;
   let prevY = 0;
+
+  const props = defineProps({
+    lineWidth: {
+      type: Number,
+      default: 1,
+    },
+    superDotWidth: {
+      type: Number,
+      default: 3,
+    },
+    canvasHeight: {
+      type: Number,
+      default: 400
+    },
+    canvasWidth: {
+      type: Number,
+      default: 400
+    },
+  })
 
   onMounted(() => {
     canvas = document.getElementById('mainDraw');
@@ -23,10 +37,10 @@
     context.beginPath();
     context.fillStyle = "blue";
     context.fillRect(
-        x - Math.floor(superDotWidth / 2),
-        y - Math.floor(superDotWidth / 2),
-        superDotWidth,
-        superDotWidth
+        x - Math.floor(props.superDotWidth / 2),
+        y - Math.floor(props.superDotWidth / 2),
+        props.superDotWidth,
+        props.superDotWidth
     );
     context.closePath();
   }
@@ -43,10 +57,10 @@
     context.beginPath();
     context.fillStyle = "red";
     context.fillRect(
-        Math.floor(lineWidth / 2),
-        Math.floor(lineWidth / 2),
-        lineWidth,
-        lineWidth
+        Math.floor(props.lineWidth / 2),
+        Math.floor(props.lineWidth / 2),
+        props.lineWidth,
+        props.lineWidth
     );
     context.closePath();
   }
@@ -81,28 +95,32 @@
     context.moveTo(prevX, prevY);
     context.lineTo(currX, currY);
     context.strokeStyle = "red";
-    context.lineWidth = lineWidth;
+    context.lineWidth = props.lineWidth;
     context.stroke();
     context.closePath();
   }
 
+  function clearCanvas() {
+    context.clearRect(0, 0, props.canvasWidth, props.canvasHeight)
+  }
 
+  defineExpose({
+    clearCanvas
+  })
 </script>
 
 <template>
-  <div>
-    <canvas
-        id="mainDraw"
-        :width="canvasWidth"
-        :height="canvasHeight"
-        :class="`w-${canvasWidth/4} h-${canvasHeight/4} border-solid border-red-600 border-2 bg-gray-100`"
-        @mousedown="canvasStartDrawing"
-        @mouseup="canvasStopDrawing"
-        @mouseleave="canvasStopDrawing"
-        @mouseout="canvasStopDrawing"
-        @mousemove="canvasMouseMove"
-    />
-  </div>
+  <canvas
+      id="mainDraw"
+      :width="canvasWidth"
+      :height="canvasHeight"
+      :class="`w-${canvasWidth/4} h-${canvasHeight/4} border-solid border-red-600 border-2 bg-gray-100`"
+      @mousedown="canvasStartDrawing"
+      @mouseup="canvasStopDrawing"
+      @mouseleave="canvasStopDrawing"
+      @mouseout="canvasStopDrawing"
+      @mousemove="canvasMouseMove"
+  />
 </template>
 
 <style scoped>

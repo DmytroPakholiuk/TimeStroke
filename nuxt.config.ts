@@ -34,6 +34,7 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
+    'reka-ui/nuxt',
     // '@tailwindcss/postcss',
   ]
-})
+});

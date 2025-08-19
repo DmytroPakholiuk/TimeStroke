@@ -4,7 +4,7 @@
 
 <template>
   <div class="content-center mx-auto">
-    <drawing-field />
+    <frame-definition-tool />
   </div>
 </template>
 
