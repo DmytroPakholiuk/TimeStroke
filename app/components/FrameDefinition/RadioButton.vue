@@ -56,7 +56,7 @@ function selectFrameLayer($event) {
           @select="selectMotionLayer"
       >
         <form-ui-button
-            :class="isMotionLayerSelected ? 'bg-blue-500 text-white hover:text-black' : ''"
+            :class="isMotionLayerSelected ? 'bg-gray-500 text-white hover:text-black' : ''"
         >
           Motion layer
           <span :hidden="!isMotionLayerSelected">
