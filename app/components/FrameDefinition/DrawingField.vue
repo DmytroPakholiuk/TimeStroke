@@ -31,7 +31,24 @@
   onMounted(() => {
     canvas = document.getElementById('mainDraw');
     context = canvas.getContext("2d");
+    window.addEventListener('super-dot', handleSuperDot);
   })
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('super-dot', handleSuperDot);
+  })
+
+  async function handleSuperDot(event) {
+    const { x, y, frameNo } = event.detail;
+
+    // імітація асинхронності
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    if (!superDots[frameNo]) {
+      superDots[frameNo] = { x, y };
+      putSuperDot(x, y);
+    }
+  }
 
   function putSuperDot(x: number, y: number) {
     context.beginPath();
@@ -81,11 +98,13 @@
       const drawTime = Date.now();
       const frameNo = Math.floor((drawTime - drawingStartTime) / (1000 / 24))
       if (! superDots[frameNo]) {
-        superDots[frameNo] = {
-          x: currX,
-          y: currY,
-        }
-        putSuperDot(currX, currY)
+        window.dispatchEvent(new CustomEvent('super-dot', {
+          detail: {
+            x: currX,
+            y: currY,
+            frameNo
+          }
+        }));
       }
     }
   }

@@ -42,7 +42,7 @@ function updateCanvasWidth(newVal) {
           Clear
         </form-ui-button>
 
-        <frame-definition-radio-button></frame-definition-radio-button>
+        <frame-definition-radio-button/>
       </div>
       <div class="flex justify-between">
         <div>
