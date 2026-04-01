@@ -7,7 +7,7 @@ const frameStore = useFrameStore();
 </script>
 
 <template>
-  <ListboxRoot v-model="frameStore.chosenSuperPoint" class=" flex flex-col rounded-lg shadow-sm border dark:border-stone-900 overflow-hidden bg-white text-grass9 mx-auto ">
+  <ListboxRoot v-model="frameStore.chosenSuperPoint" class=" flex flex-col rounded-lg border dark:border-stone-900 overflow-hidden bg-white text-grass9 mx-auto ">
     <ListboxContent class="p-[5px] w-48 h-72 overflow-auto">
       <ListboxGroup>
         <ListboxGroupLabel class="px-[25px] text-xs leading-[25px] text-mauve11">

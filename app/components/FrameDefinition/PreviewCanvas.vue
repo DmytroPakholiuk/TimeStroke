@@ -4,11 +4,9 @@ import {useFrameStore} from "~/store/frames";
 
 let canvas;
 let context;
+let bufferCanvas;
+let bufferCtx;
 const frameStore = useFrameStore()
-let previewFrame = 0;
-let lastTime = 0;
-let currentPreviewFrame = 0;
-
 
 const props = defineProps({
   canvasHeight: {
@@ -24,29 +22,18 @@ const props = defineProps({
 onMounted(() => {
   canvas = document.getElementById('previewCanvas');
   context = canvas.getContext("2d");
+  bufferCanvas = document.createElement('canvas');
+  bufferCtx = bufferCanvas.getContext('2d');
 })
 
 watch(
     () => frameStore.chosenSuperPoint,
-    (newValue, oldValue) => drawFrame(newValue)
+    (newValue) => drawFrame(newValue)
 
 )
 
 function clearCanvas() {
   context.clearRect(0, 0, props.canvasWidth, props.canvasHeight)
-}
-
-function previewLoop(time) {
-  if (!frameStore.isMotionLayerSelected) return;
-
-
-  // if (time - lastTime > 1000 / FPS) {
-  //   drawFrame(previewFrame);
-  //   previewFrame++;
-  //   lastTime = time;
-  // }
-
-  requestAnimationFrame(previewLoop);
 }
 
 async function drawFrame(frameNo) {
@@ -58,6 +45,8 @@ async function drawFrame(frameNo) {
 
   const img = await createImageBitmap(frameStore.sprite);
 
+  handleOnionSkin(frameNo, img);
+
   // 1. малюємо картинку (якщо є)
   if (frameStore.sprite) {
     context.drawImage(
@@ -68,6 +57,74 @@ async function drawFrame(frameNo) {
         img.height * frameStore.spriteScalePercent / 100,
     );
   }
+}
+
+function handleOnionSkin(originalFrameNo, image) {
+  for (let i = 1; i <= frameStore.onionSkinSize; i++) {
+    const previousFrame = frameStore.superDots[originalFrameNo - i];
+    if (!previousFrame) continue;
+
+    const w = image.width * frameStore.spriteScalePercent / 100;
+    const h = image.height * frameStore.spriteScalePercent / 100;
+
+    const x = previousFrame.x - w / 2;
+    const y = previousFrame.y - h / 2;
+
+    const alpha = Math.pow(0.6, i);
+    drawTintedImage(
+        context,
+        image,
+        x,
+        y,
+        w,
+        h,
+        'red',
+        alpha
+    );
+  }
+  for (let i = 1; i <= frameStore.onionSkinSize; i++) {
+    const previousFrame = frameStore.superDots[originalFrameNo + i];
+    if (!previousFrame) continue;
+
+    const w = image.width * frameStore.spriteScalePercent / 100;
+    const h = image.height * frameStore.spriteScalePercent / 100;
+
+    const x = previousFrame.x - w / 2;
+    const y = previousFrame.y - h / 2;
+
+    const alpha = Math.pow(0.6, i);
+    drawTintedImage(
+        context,
+        image,
+        x,
+        y,
+        w,
+        h,
+        'green',
+        alpha
+    );
+  }
+}
+
+function drawTintedImage(ctx, image, x, y, w, h, color, alpha) {
+  bufferCanvas.width = w;
+  bufferCanvas.height = h;
+
+  // 1. чистимо buffer
+  bufferCtx.clearRect(0, 0, w, h);
+
+  // 2. малюємо оригінал
+  bufferCtx.drawImage(image, 0, 0, w, h);
+
+  // 3. tint тільки по непрозорих пікселях
+  bufferCtx.globalCompositeOperation = 'source-in';
+  bufferCtx.fillStyle = color;
+  bufferCtx.fillRect(0, 0, w, h);
+
+  // 4. малюємо на основний canvas
+  ctx.globalAlpha = alpha;
+  ctx.drawImage(bufferCanvas, x, y);
+  ctx.globalAlpha = 1;
 }
 
 defineExpose({

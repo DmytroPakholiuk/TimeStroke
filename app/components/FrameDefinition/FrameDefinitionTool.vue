@@ -3,9 +3,11 @@ import DrawingField from "~/components/FrameDefinition/DrawingField.vue";
 import PreviewCanvas from "~/components/FrameDefinition/PreviewCanvas.vue";
 import {useFrameStore} from "~/store/frames";
 import FrameListbox from "~/components/FrameDefinition/FrameListbox.vue";
+import MotionCanvas from "~/components/FrameDefinition/MotionCanvas.vue";
 
 const canvasRef = ref(null);
 const previewCanvasRef = ref(null);
+const motionCanvasRef = ref(null);
 const lineWidth = ref(1);
 const superDotWidth = ref(3);
 const canvasHeight = ref(400);
@@ -19,6 +21,7 @@ function clearCanvas() {
   if (canvasRef.value) {
     canvasRef.value.clearCanvas()
     previewCanvasRef.value.clearCanvas()
+    motionCanvasRef.value.clearCanvas()
   }
 }
 
@@ -56,9 +59,17 @@ function updateCanvasWidth(newVal) {
               class="mx-auto absolute inset-0 pointer-events-none"
           />
         </div>
+        <div>
+          <motion-canvas
+              ref="motionCanvasRef"
+              :canvas-height="canvasHeight"
+              :canvas-width="canvasWidth"
+              class="mx-auto absolute inset-0 pointer-events-none"
+          />
+        </div>
       </div>
       <div>
-        <frame-listbox />
+        <frame-listbox class="ml-5" />
       </div>
     </div>
     <div>
@@ -112,18 +123,44 @@ function updateCanvasWidth(newVal) {
           </ToggleGroupRoot>
         </div>
         <div>
-          <UFileUpload v-model="frameStore.sprite" accept="image/png">
+          <UFileUpload v-model="frameStore.sprite" accept="image/png" class="">
 
           </UFileUpload>
-          <div>
-            Sprite Scale: <span class="text-red-500">{{frameStore.spriteScalePercent[0] ?? 100}}%</span>
-            <form-slider
-                v-model="frameStore.spriteScalePercent"
-                :max="400"
-                :min="0"
-                :step="10"
-            />
-          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-between">
+      <div>
+        Onion skin frames:
+        <ToggleGroupRoot
+            v-model="frameStore.onionSkinSize"
+            type="single"
+            class="flex border shadow-sm rounded-lg w-50"
+        >
+          <ToggleGroupItem value="0" :class="toggleGroupItemClasses">
+            0
+          </ToggleGroupItem>
+          <ToggleGroupItem value="1" :class="toggleGroupItemClasses">
+            1
+          </ToggleGroupItem>
+          <ToggleGroupItem value="2" :class="toggleGroupItemClasses">
+            2
+          </ToggleGroupItem>
+          <ToggleGroupItem value="3" :class="toggleGroupItemClasses">
+            3
+          </ToggleGroupItem>
+        </ToggleGroupRoot>
+      </div>
+      <div>
+        <div>
+          Sprite Scale: <span class="text-red-500">{{frameStore.spriteScalePercent[0] ?? 100}}%</span>
+          <form-slider
+              v-model="frameStore.spriteScalePercent"
+              :max="400"
+              :min="0"
+              :step="10"
+          />
         </div>
       </div>
     </div>

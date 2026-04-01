@@ -51,20 +51,6 @@ function selectFrameLayer() {
     </div>
     <div class="flex items-center">
       <RadioGroupItem
-          @select="selectMotionLayer"
-      >
-        <form-ui-button
-            :class="frameStore.isMotionLayerSelected ? 'bg-orange-500 text-white hover:text-black' : ''"
-        >
-          Motion layer
-          <span :hidden="!frameStore.isMotionLayerSelected">
-            📊
-          </span>
-        </form-ui-button>
-      </RadioGroupItem>
-    </div>
-    <div class="flex items-center">
-      <RadioGroupItem
           @select="selectFrameLayer"
       >
         <form-ui-button
@@ -73,6 +59,20 @@ function selectFrameLayer() {
           Frame layer
           <span :hidden="!frameStore.isFrameLayerSelected">
             🎭
+          </span>
+        </form-ui-button>
+      </RadioGroupItem>
+    </div>
+    <div class="flex items-center">
+      <RadioGroupItem
+          @select="selectMotionLayer"
+      >
+        <form-ui-button
+            :class="frameStore.isMotionLayerSelected ? 'bg-orange-500 text-white hover:text-black' : ''"
+        >
+          Motion layer
+          <span :hidden="!frameStore.isMotionLayerSelected">
+            📊
           </span>
         </form-ui-button>
       </RadioGroupItem>
