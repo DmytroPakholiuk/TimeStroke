@@ -1,30 +1,28 @@
 <script setup lang="ts">
-import { RadioGroupIndicator, RadioGroupItem, RadioGroupRoot } from 'reka-ui'
+import { RadioGroupItem, RadioGroupRoot } from 'reka-ui'
 import { ref } from 'vue'
+import {useFrameStore} from "~/store/frames";
 
 const radioStateSingle = ref('default')
 
-const isDrawingLayerSelected = ref(true)
-const isMotionLayerSelected = ref(false)
-const isFrameLayerSelected = ref(false)
+const frameStore = useFrameStore()
 
-function selectDrawingLayer($event) {
-  isDrawingLayerSelected.value = true;
-  isMotionLayerSelected.value = false;
-  isFrameLayerSelected.value = false;
-  console.log($event)
+function selectDrawingLayer() {
+  frameStore.isDrawingLayerSelected = true;
+  frameStore.isMotionLayerSelected = false;
+  frameStore.isFrameLayerSelected = false;
 }
 
-function selectMotionLayer($event) {
-  isDrawingLayerSelected.value = false;
-  isMotionLayerSelected.value = true;
-  isFrameLayerSelected.value = false;
+function selectMotionLayer() {
+  frameStore.isDrawingLayerSelected = false;
+  frameStore.isMotionLayerSelected = true;
+  frameStore.isFrameLayerSelected = false;
 }
 
-function selectFrameLayer($event) {
-  isDrawingLayerSelected.value = false;
-  isMotionLayerSelected.value = false;
-  isFrameLayerSelected.value = true;
+function selectFrameLayer() {
+  frameStore.isDrawingLayerSelected = false;
+  frameStore.isMotionLayerSelected = false;
+  frameStore.isFrameLayerSelected = true;
 }
 
 </script>
@@ -42,10 +40,10 @@ function selectFrameLayer($event) {
           @select="selectDrawingLayer"
       >
         <form-ui-button
-          :class="isDrawingLayerSelected ? 'bg-red-500 text-white hover:text-black' : ''"
+          :class="frameStore.isDrawingLayerSelected ? 'bg-red-500 text-white hover:text-black' : ''"
         >
           Drawing layer
-          <span :hidden="!isDrawingLayerSelected">
+          <span :hidden="!frameStore.isDrawingLayerSelected">
             🖼
           </span>
         </form-ui-button>
@@ -56,10 +54,10 @@ function selectFrameLayer($event) {
           @select="selectMotionLayer"
       >
         <form-ui-button
-            :class="isMotionLayerSelected ? 'bg-gray-500 text-white hover:text-black' : ''"
+            :class="frameStore.isMotionLayerSelected ? 'bg-orange-500 text-white hover:text-black' : ''"
         >
           Motion layer
-          <span :hidden="!isMotionLayerSelected">
+          <span :hidden="!frameStore.isMotionLayerSelected">
             📊
           </span>
         </form-ui-button>
@@ -70,10 +68,10 @@ function selectFrameLayer($event) {
           @select="selectFrameLayer"
       >
         <form-ui-button
-            :class="isFrameLayerSelected ? 'bg-green-500 text-white hover:text-black' : ''"
+            :class="frameStore.isFrameLayerSelected ? 'bg-green-500 text-white hover:text-black' : ''"
         >
           Frame layer
-          <span :hidden="!isFrameLayerSelected">
+          <span :hidden="!frameStore.isFrameLayerSelected">
             🎭
           </span>
         </form-ui-button>

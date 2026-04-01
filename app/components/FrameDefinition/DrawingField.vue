@@ -1,6 +1,8 @@
 <script setup lang="ts">
+  import {useFrameStore} from "~/store/frames";
+
   const mouseIsDown = ref(false);
-  const superDots = [];
+  let superPointsDrawn = 0;
   let drawingStartTime;
   let canvas;
   let context;
@@ -8,6 +10,7 @@
   let currY = 0;
   let prevX = 0;
   let prevY = 0;
+  const frameStore = useFrameStore()
 
   const props = defineProps({
     lineWidth: {
@@ -39,18 +42,26 @@
   })
 
   async function handleSuperDot(event) {
-    const { x, y, frameNo } = event.detail;
+    const { x, y, frameNo, drawTime } = event.detail;
 
     // імітація асинхронності
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    if (!superDots[frameNo]) {
-      superDots[frameNo] = { x, y };
-      putSuperDot(x, y);
+    if (!frameStore.superDots[superPointsDrawn + frameNo]) {
+      if ((superPointsDrawn + frameNo) % frameStore.animatingOn == 0) {
+        frameStore.addSuperDot(superPointsDrawn + frameNo, {
+          x,
+          y,
+          frameNo,
+          drawTime
+        })
+        drawSuperDot(x, y);
+      }
     }
+    // console.log(frameStore.superDots, superPointsDrawn, frameNo)
   }
 
-  function putSuperDot(x: number, y: number) {
+  function drawSuperDot(x: number, y: number) {
     context.beginPath();
     context.fillStyle = "blue";
     context.fillRect(
@@ -63,6 +74,10 @@
   }
 
   function canvasStartDrawing($event) {
+    if (!frameStore.isDrawingLayerSelected) {
+      return;
+    }
+
     prevX = currX;
     prevY = currY;
     currX = $event.clientX - canvas.getBoundingClientRect().left;
@@ -84,7 +99,8 @@
 
   function canvasStopDrawing() {
     mouseIsDown.value = false;
-    superDots.length = 0;
+    const keys = Object.keys(frameStore.superDots).map(Number);
+    superPointsDrawn = Math.max(...keys);
   }
 
   function canvasMouseMove($event) {
@@ -96,13 +112,14 @@
       draw();
 
       const drawTime = Date.now();
-      const frameNo = Math.floor((drawTime - drawingStartTime) / (1000 / 24))
-      if (! superDots[frameNo]) {
+      const frameNo = Math.floor((drawTime - drawingStartTime) / (1000 / frameStore.baseFps))
+      if (! frameStore.superDots[superPointsDrawn + frameNo]) {
         window.dispatchEvent(new CustomEvent('super-dot', {
           detail: {
             x: currX,
             y: currY,
-            frameNo
+            frameNo,
+            drawTime,
           }
         }));
       }
@@ -120,7 +137,9 @@
   }
 
   function clearCanvas() {
-    context.clearRect(0, 0, props.canvasWidth, props.canvasHeight)
+    context.clearRect(0, 0, props.canvasWidth, props.canvasHeight);
+    frameStore.superDots = {};
+    superPointsDrawn = 0;
   }
 
   defineExpose({

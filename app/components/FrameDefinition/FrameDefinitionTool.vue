@@ -1,14 +1,24 @@
 <script setup lang="ts">
 import DrawingField from "~/components/FrameDefinition/DrawingField.vue";
+import PreviewCanvas from "~/components/FrameDefinition/PreviewCanvas.vue";
+import {useFrameStore} from "~/store/frames";
+import FrameListbox from "~/components/FrameDefinition/FrameListbox.vue";
+
 const canvasRef = ref(null);
+const previewCanvasRef = ref(null);
 const lineWidth = ref(1);
 const superDotWidth = ref(3);
 const canvasHeight = ref(400);
 const canvasWidth = ref(500);
+const frameStore = useFrameStore();
+
+const toggleGroupItemClasses
+    = 'hover:bg-red-200 hover:text-black text-mauve11 data-[state=on]:bg-red-700 data-[state=on]:text-white flex h-[35px] w-[70px] items-center justify-center text-base leading-4 first:rounded-l-[7px] last:rounded-r-[7px] focus:z-10 focus:shadow-[0_0_0_2px] focus:shadow-black focus:outline-none '
 
 function clearCanvas() {
   if (canvasRef.value) {
     canvasRef.value.clearCanvas()
+    previewCanvasRef.value.clearCanvas()
   }
 }
 
@@ -26,15 +36,30 @@ function updateCanvasWidth(newVal) {
 
 <template>
   <div class="container mx-auto mt-5">
-    <div>
-      <drawing-field
-          ref="canvasRef"
-          :line-width="lineWidth"
-          :super-dot-width="superDotWidth"
-          :canvas-height="canvasHeight"
-          :canvas-width="canvasWidth"
-          class="mx-auto"
-      />
+    <div class="flex">
+      <div class="relative inline-block">
+        <div>
+          <drawing-field
+              ref="canvasRef"
+              :line-width="lineWidth"
+              :super-dot-width="superDotWidth"
+              :canvas-height="canvasHeight"
+              :canvas-width="canvasWidth"
+              class="mx-auto"
+          />
+        </div>
+        <div>
+          <preview-canvas
+              ref="previewCanvasRef"
+              :canvas-height="canvasHeight"
+              :canvas-width="canvasWidth"
+              class="mx-auto absolute inset-0 pointer-events-none"
+          />
+        </div>
+      </div>
+      <div>
+        <frame-listbox />
+      </div>
     </div>
     <div>
       <div class="flex justify-between">
@@ -65,6 +90,45 @@ function updateCanvasWidth(newVal) {
         </div>
       </div>
     </div>
+
+    <div>
+      <div class="flex justify-between">
+        <div>
+          Animating on:
+          <ToggleGroupRoot
+              v-model="frameStore.animatingOn"
+              type="single"
+              class="flex border shadow-sm rounded-lg w-50"
+          >
+            <ToggleGroupItem value="1" :class="toggleGroupItemClasses">
+              Ones
+            </ToggleGroupItem>
+            <ToggleGroupItem value="2" :class="toggleGroupItemClasses">
+              Twos
+            </ToggleGroupItem>
+            <ToggleGroupItem value="3" :class="toggleGroupItemClasses">
+              Threes
+            </ToggleGroupItem>
+          </ToggleGroupRoot>
+        </div>
+        <div>
+          <UFileUpload v-model="frameStore.sprite" accept="image/png">
+
+          </UFileUpload>
+          <div>
+            Sprite Scale: <span class="text-red-500">{{frameStore.spriteScalePercent[0] ?? 100}}%</span>
+            <form-slider
+                v-model="frameStore.spriteScalePercent"
+                :max="400"
+                :min="0"
+                :step="10"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+
   </div>
 </template>
 
