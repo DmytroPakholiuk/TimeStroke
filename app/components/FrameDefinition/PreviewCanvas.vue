@@ -40,7 +40,6 @@ async function drawFrame(frameNo) {
   context.clearRect(0, 0, canvas.width, canvas.height);
 
   const frame = frameStore.superDots[frameNo];
-  console.log(frame, frameStore.sprite);
   if (!frame) return;
 
   const img = await createImageBitmap(frameStore.sprite);

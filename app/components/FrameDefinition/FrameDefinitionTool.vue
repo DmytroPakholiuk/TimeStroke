@@ -4,6 +4,7 @@ import PreviewCanvas from "~/components/FrameDefinition/PreviewCanvas.vue";
 import {useFrameStore} from "~/store/frames";
 import FrameListbox from "~/components/FrameDefinition/FrameListbox.vue";
 import MotionCanvas from "~/components/FrameDefinition/MotionCanvas.vue";
+import UiButton from "~/components/Form/UiButton.vue";
 
 const canvasRef = ref(null);
 const previewCanvasRef = ref(null);
@@ -17,11 +18,19 @@ const frameStore = useFrameStore();
 const toggleGroupItemClasses
     = 'hover:bg-red-200 hover:text-black text-mauve11 data-[state=on]:bg-red-700 data-[state=on]:text-white flex h-[35px] w-[70px] items-center justify-center text-base leading-4 first:rounded-l-[7px] last:rounded-r-[7px] focus:z-10 focus:shadow-[0_0_0_2px] focus:shadow-black focus:outline-none '
 
+onMounted(() => {
+
+})
+
 function clearCanvas() {
   if (canvasRef.value) {
-    canvasRef.value.clearCanvas()
-    previewCanvasRef.value.clearCanvas()
-    motionCanvasRef.value.clearCanvas()
+    canvasRef.value?.clearCanvas()
+    previewCanvasRef.value?.clearCanvas()
+    motionCanvasRef.value?.clearCanvas()
+
+    canvasRef.value?.clearCanvas()
+    previewCanvasRef.value?.clearCanvas()
+    motionCanvasRef.value?.clearCanvas()
   }
 }
 
@@ -33,7 +42,20 @@ function updateCanvasWidth(newVal) {
   canvasWidth.value = newVal;
 }
 
+function playPreview() {
+  if (!motionCanvasRef.value) return
+  motionCanvasRef.value.startPreview()
+}
 
+function pausePreview() {
+  if (!motionCanvasRef.value) return
+  motionCanvasRef.value.pausePreview()
+}
+
+function stopPreview() {
+  if (!motionCanvasRef.value) return
+  motionCanvasRef.value.stopPreview()
+}
 
 </script>
 
@@ -70,6 +92,12 @@ function updateCanvasWidth(newVal) {
       </div>
       <div>
         <frame-listbox class="ml-5" />
+        <div>
+          <ui-button @click="playPreview">Play</ui-button>
+          <ui-button @click="pausePreview">Pause</ui-button>
+          <ui-button @click="stopPreview">Stop</ui-button>
+          <ui-button @click="stop">Export</ui-button>
+        </div>
       </div>
     </div>
     <div>
