@@ -11,6 +11,8 @@ let endTime = null;
 const isPlaying = ref(false)
 let pausedAt = 0
 let img = null
+let duration = null
+let defaultSpriteBitmap = null
 
 const props = defineProps({
   canvasHeight: {
@@ -26,20 +28,33 @@ const props = defineProps({
 onMounted(() => {
   canvas = document.getElementById('motionCanvas');
   context = canvas.getContext("2d");
+  loadDefaultSprite();
 })
+
+async function loadDefaultSprite() {
+  const res = await fetch('/default-sprite.png')
+  const blob = await res.blob()
+  defaultSpriteBitmap = await createImageBitmap(blob)
+}
 
 function clearCanvas() {
   context.clearRect(0, 0, props.canvasWidth, props.canvasHeight)
+  stopPreview()
 }
 
 async function startPreview() {
   if (isPlaying.value) return
 
-  img = await createImageBitmap(frameStore.sprite);
+  if (frameStore.sprite) {
+    img = await createImageBitmap(frameStore.sprite);
+  } else {
+    img = defaultSpriteBitmap;
+  }
 
   allFrames = Object.values(frameStore.superDots);
   startTime = Math.min(...allFrames.map(f => f.drawTime));
   endTime = Math.max(...allFrames.map(f => f.drawTime));
+  duration = endTime - startTime;
 
   isPlaying.value = true
 
@@ -59,6 +74,7 @@ function pausePreview() {
 function stopPreview() {
   isPlaying.value = false
   pausedAt = 0
+  context.clearRect(0, 0, props.canvasWidth, props.canvasHeight)
 }
 
 function getRelativeTime(drawTime) {
@@ -69,8 +85,9 @@ function loop(now) {
   if (!isPlaying.value) return
 
   const elapsed = now - previewStart;
+  const loopedTime = elapsed % duration;
 
-  drawFrameAtTime(elapsed);
+  drawFrameAtTime(loopedTime);
 
   requestAnimationFrame(loop);
 }
@@ -103,8 +120,7 @@ async function drawFrame(frameNo) {
   const frame = frameNo;
   if (!frame) return;
 
-
-  if (frameStore.sprite) {
+  if (img) {
     context.drawImage(
         img,
         frame.x - (img.width * frameStore.spriteScalePercent / 100) / 2,

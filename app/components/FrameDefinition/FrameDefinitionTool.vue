@@ -92,9 +92,11 @@ function stopPreview() {
       </div>
       <div>
         <frame-listbox class="ml-5" />
-        <div>
+        <div class="flex justify-between">
           <ui-button @click="playPreview">Play</ui-button>
           <ui-button @click="pausePreview">Pause</ui-button>
+        </div>
+        <div class="flex justify-between">
           <ui-button @click="stopPreview">Stop</ui-button>
           <ui-button @click="stop">Export</ui-button>
         </div>
