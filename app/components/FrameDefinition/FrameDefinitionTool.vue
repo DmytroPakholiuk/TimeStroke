@@ -5,8 +5,10 @@ import {useFrameStore} from "~/store/frames";
 import FrameListbox from "~/components/FrameDefinition/FrameListbox.vue";
 import MotionCanvas from "~/components/FrameDefinition/MotionCanvas.vue";
 import UiButton from "~/components/Form/UiButton.vue";
+import ExportCanvas from "~/components/FrameDefinition/ExportCanvas.vue";
 
 const canvasRef = ref(null);
+const exportCanvas = ref(null);
 const previewCanvasRef = ref(null);
 const motionCanvasRef = ref(null);
 const lineWidth = ref(1);
@@ -18,19 +20,18 @@ const frameStore = useFrameStore();
 const toggleGroupItemClasses
     = 'hover:bg-red-200 hover:text-black text-mauve11 data-[state=on]:bg-red-700 data-[state=on]:text-white flex h-[35px] w-[70px] items-center justify-center text-base leading-4 first:rounded-l-[7px] last:rounded-r-[7px] focus:z-10 focus:shadow-[0_0_0_2px] focus:shadow-black focus:outline-none '
 
-onMounted(() => {
-
-})
 
 function clearCanvas() {
   if (canvasRef.value) {
     canvasRef.value?.clearCanvas()
     previewCanvasRef.value?.clearCanvas()
+    exportCanvas.value?.clearCanvas()
     motionCanvasRef.value?.clearCanvas()
 
     canvasRef.value?.clearCanvas()
     previewCanvasRef.value?.clearCanvas()
     motionCanvasRef.value?.clearCanvas()
+    exportCanvas.value?.clearCanvas()
   }
 }
 
@@ -56,6 +57,21 @@ function stopPreview() {
   if (!motionCanvasRef.value) return
   motionCanvasRef.value.stopPreview()
 }
+
+// function exportZip() {
+//   if (!exportCanvas.value) return
+//   exportCanvas.value.exportZip()
+// }
+
+function exportMp4() {
+  if (!motionCanvasRef.value) return
+  motionCanvasRef.value.exportVideo()
+}
+
+// function exportGif() {
+//   if (!exportCanvas.value) return
+//   exportCanvas.value.exportGif()
+// }
 
 </script>
 
@@ -89,6 +105,14 @@ function stopPreview() {
               class="mx-auto absolute inset-0 pointer-events-none"
           />
         </div>
+<!--        <div>-->
+<!--          <export-canvas-->
+<!--              ref="exportCanvas"-->
+<!--              :canvas-height="canvasHeight"-->
+<!--              :canvas-width="canvasWidth"-->
+<!--              class="mx-auto absolute inset-0 pointer-events-none"-->
+<!--          />-->
+<!--        </div>-->
       </div>
       <div>
         <frame-listbox class="ml-5" />
@@ -97,8 +121,10 @@ function stopPreview() {
           <ui-button @click="pausePreview">Pause</ui-button>
         </div>
         <div class="flex justify-between">
+<!--          <ui-button @click="exportGif">Export GIF</ui-button>-->
+<!--          <ui-button @click="exportZip">Export ZIP</ui-button>-->
           <ui-button @click="stopPreview">Stop</ui-button>
-          <ui-button @click="stop">Export</ui-button>
+          <ui-button @click="exportMp4">Export</ui-button>
         </div>
       </div>
     </div>

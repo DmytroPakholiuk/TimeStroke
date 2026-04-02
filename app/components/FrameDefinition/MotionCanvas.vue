@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {useFrameStore} from "~/store/frames";
+import JSZip from 'jszip'
 
 let canvas;
 let context;
@@ -77,10 +78,6 @@ function stopPreview() {
   context.clearRect(0, 0, props.canvasWidth, props.canvasHeight)
 }
 
-function getRelativeTime(drawTime) {
-  return drawTime - startTime;
-}
-
 function loop(now) {
   if (!isPlaying.value) return
 
@@ -131,11 +128,74 @@ async function drawFrame(frameNo) {
   }
 }
 
+async function exportVideo() {
+  if (frameStore.sprite) {
+    img = await createImageBitmap(frameStore.sprite);
+  } else {
+    img = defaultSpriteBitmap;
+  }
+
+  const stream = canvas.captureStream()
+  const recorder = new MediaRecorder(stream, {
+    mimeType: 'video/webm'
+  })
+
+  const chunks = []
+
+  recorder.ondataavailable = e => {
+    if (e.data.size > 0) chunks.push(e.data)
+  }
+
+  recorder.onstop = () => {
+    const blob = new Blob(chunks, { type: 'video/webm' })
+
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'animation.webm'
+    a.click()
+  }
+
+  recorder.start()
+
+  await playAndRecord()
+
+  recorder.stop()
+}
+
+function playAndRecord() {
+  return new Promise(resolve => {
+    const frames = Object.values(frameStore.superDots)
+    const startTime = Math.min(...frames.map(f => f.drawTime))
+    const endTime = Math.max(...frames.map(f => f.drawTime))
+    const duration = endTime - startTime
+
+    const previewStart = performance.now()
+
+    function loop(now) {
+      const elapsed = now - previewStart
+      const loopedTime = elapsed % duration
+
+      drawFrameAtTime(loopedTime)
+
+      if (elapsed >= duration) {
+        resolve()
+        return
+      }
+
+      requestAnimationFrame(loop)
+    }
+
+    requestAnimationFrame(loop)
+  })
+}
+
 defineExpose({
   clearCanvas,
   startPreview,
   pausePreview,
   stopPreview,
+  exportVideo,
 })
 </script>
 

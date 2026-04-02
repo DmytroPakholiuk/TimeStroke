@@ -19,6 +19,8 @@
     "@tailwindcss/vite": "^4.1.12",
     "@unhead/vue": "^2.0.14",
     "eslint": "^9.33.0",
+    "gif.js": "^0.2.0",
+    "jszip": "^3.10.1",
     "nuxt": "^4.0.3",
     "pinia": "^3.0.3",
     "pinia-plugin-persistedstate": "^4.5.0",
